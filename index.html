@@ -599,25 +599,8 @@
     return weekNo;
   }
 
-  // ---------- NEW: compute parity with September override ----------
-  function rangesOverlap(aStart,aEnd,bStart,bEnd){
-    return aStart.getTime() <= bEnd.getTime() && bStart.getTime() <= aEnd.getTime();
-  }
-
+  // ---- replaced: use pure ISO parity (1,2,1,2,...) ----
   function computeParity(monday){
-    const year = monday.getFullYear();
-    const weekStart = new Date(monday);
-    const weekEnd = new Date(monday);
-    weekEnd.setDate(weekEnd.getDate() + 6);
-
-    const sep1 = new Date(year, 8, 1);  // Sept 1
-    const sep7 = new Date(year, 8, 7);  // Sept 7
-    const sep8 = new Date(year, 8, 8);  // Sept 8
-    const sep14 = new Date(year, 8, 14);// Sept 14
-
-    if (rangesOverlap(weekStart, weekEnd, sep1, sep7)) return 1;
-    if (rangesOverlap(weekStart, weekEnd, sep8, sep14)) return 2;
-
     const iso = isoWeekNumber(monday);
     return (iso % 2) === 1 ? 1 : 2;
   }
