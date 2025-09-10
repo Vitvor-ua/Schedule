@@ -599,10 +599,20 @@
     return weekNo;
   }
 
-  // ---- replaced: use pure ISO parity (1,2,1,2,...) ----
+  // ---- compute parity anchored so week containing Sep 1 is treated as parity 1 ----
   function computeParity(monday){
-    const iso = isoWeekNumber(monday);
-    return (iso % 2) === 1 ? 1 : 2;
+    // reference = monday of the week that contains Sept 1 for the relevant academic year
+    const year = monday.getFullYear();
+    // monday that contains Sep 1 in same year
+    let refMonday = mondayOf(new Date(year, 8, 1)); // Sept = month 8
+    // if current monday is before that reference, use previous year's Sept 1 week as reference
+    if (monday < refMonday){
+      refMonday = mondayOf(new Date(year - 1, 8, 1));
+    }
+    const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+    const diffWeeks = Math.round((monday.getTime() - refMonday.getTime()) / msPerWeek);
+    // even difference => same parity as reference (reference = 1), odd => opposite (2)
+    return (diffWeeks % 2 === 0) ? 1 : 2;
   }
 
   // render day headers with dates
