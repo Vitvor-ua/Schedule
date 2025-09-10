@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Розклад by Vitvor</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #0f1724;
+    --card: #0b1220;
+    --muted: #9aa4b2;
+    --accent: linear-gradient(90deg,#7c3aed,#06b6d4);
+    --text: #e6eef5;
+    --glass: rgba(255,255,255,0.03);
+    --accent-solid: #7c3aed;
+    --slot-bg: rgba(255,255,255,0.03);
+    --now-line: rgba(255,80,80,0.95);
+    --shadow: 0 8px 30px rgba(2,6,23,0.7);
+    transition: 300ms;
+  }
+  [data-theme="light"]{
+    --bg: #f6f7fb;
+    --card: #ffffff;
+    --muted: #4b5563;
+    --text: #0b1220;
+    --glass: rgba(8,12,20,0.03);
+    --slot-bg: rgba(8,12,20,0.03);
+    --now-line: #e11d48;
+    --shadow: 0 8px 30px rgba(12,20,40,0.08);
+    --accent-solid: #6366f1;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,"Helvetica Neue",Arial;
+    /* softened radial accents to avoid strong pink banding */
+    background: radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.04), transparent),
+                radial-gradient(900px 500px at 90% 90%, rgba(6,182,212,0.03), transparent),
+                var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    padding:28px;
+    transition:background 300ms,color 300ms;
+  }
+
+  /* Header - increased height so fancy text fits */
+  .header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:18px;
+    padding:14px 6px 22px 6px;
+    min-height:86px;
+  }
+  .brand{
+    display:flex;
+    gap:14px;
+    align-items:center;
+  }
+  .epic{
+    font-weight:900;
+    letter-spacing:0.6px;
+    font-size:26px; /* a bit larger */
+    line-height:1;
+    background: var(--accent);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 4px 18px rgba(0,0,0,0.25);
+    transform-origin:left;
+    animation: floatText 6s ease-in-out infinite;
+    max-width:520px;
+  }
+  @keyframes floatText{
+    0%{transform:translateY(0) rotate(-1deg)}
+    50%{transform:translateY(-6px) rotate(1deg)}
+    100%{transform:translateY(0) rotate(-1deg)}
+  }
+
+  .controls{
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+  .week-header{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-weight:600;
+    padding:10px 14px;
+    border-radius:12px;
+    background:var(--card);
+    box-shadow:var(--shadow);
+    min-width:320px;
+    justify-content:center;
+  }
+  .week-nav button{
+    background:transparent;
+    border:0;
+    color:var(--muted);
+    font-size:20px;
+    cursor:pointer;
+    padding:6px;
+  }
+  .theme-toggle{
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.06);
+    padding:8px 10px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+  }
+
+  /* Layout */
+  .main{
+    display:grid;
+    grid-template-columns:220px 1fr;
+    gap:20px;
+    align-items:start;
+  }
+
+  /* Sidebar small info / legend */
+  .sidebar{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    padding:14px;
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    min-height:560px;
+  }
+  .legend h4{margin:0 0 8px 0;color:var(--muted);font-weight:600;font-size:13px}
+  .legend .item{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,0.03)}
+  .chip{height:12px;width:36px;border-radius:6px}
+  .chip.l{background:linear-gradient(90deg,#06b6d4,#7c3aed)}
+  .chip.p{background:linear-gradient(90deg,#fb923c,#f97316)}
+  .chip.lab{background:linear-gradient(90deg,#10b981,#059669)}
+
+  .side-title{font-size:13px;color:var(--muted);margin-top:14px}
+
+  /* Schedule area */
+  .schedule-card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    padding:14px;
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+
+  .days-row{
+    display:grid;
+    grid-template-columns:80px 1fr;
+    gap:10px;
+    align-items:center;
+    margin-bottom:10px;
+  }
+  .days-row .days{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap:8px;
+  }
+  .day-head{
+    text-align:center;
+    padding:10px 6px;
+    border-radius:10px;
+    font-weight:700;
+    backdrop-filter: blur(6px);
+    background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+    transition:transform 200ms;
+  }
+  .day-head.today{
+    box-shadow: 0 6px 18px rgba(99,102,241,0.12);
+    transform: translateY(-4px);
+  }
+  .day-head small{display:block;font-weight:500;color:var(--muted);font-size:12px;margin-top:6px}
+
+  /* grid */
+  .grid-wrap{
+    display:flex;
+    gap:12px;
+  }
+  .time-col{
+    width:80px;
+    min-width:80px;
+    display:flex;
+    flex-direction:column;
+    gap:0;
+    padding-top:10px;
+  }
+  .time-cell{
+    height:64px; /* 1 hour segment = 64px (we'll map minutes to px) */
+    display:flex;
+    align-items:flex-start;
+    justify-content:flex-end;
+    padding-right:8px;
+    color:var(--muted);
+    font-size:12px;
+    border-right:1px dashed rgba(255,255,255,0.03);
+  }
+  .days-grid{
+    flex:1;
+    position:relative;
+    border-radius:10px;
+    overflow:hidden;
+    padding:10px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+  }
+  .col-days{
+    display:grid;
+    grid-template-columns: repeat(4,1fr);
+    gap:8px;
+    position:relative;
+    height: 10 * 64px; /* 10 hours (8..18) => 10 * height per hour */
+  }
+  .col{
+    position:relative;
+    border-radius:8px;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.00),
+      rgba(255,255,255,0.00) 63px,
+      rgba(255,255,255,0.01) 64px
+    );
+  }
+
+  .slot{
+    position:absolute;
+    left:6%;
+    width:88%;
+    padding:10px 10px 8px 10px;
+    border-radius:12px;
+    box-shadow: 0 10px 30px rgba(2,6,23,0.45);
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    backdrop-filter: blur(6px);
+    color:var(--text);
+    border: 1px solid rgba(255,255,255,0.03);
+    font-weight:700;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    transition: transform 200ms, box-shadow 200ms;
+    cursor:pointer;
+  }
+  .slot:hover{ transform: translateY(-6px); box-shadow: 0 18px 40px rgba(2,6,23,0.6); }
+
+  .slot .meta{font-size:12px;color:var(--muted); font-weight:600; text-align: center;}
+  .slot .type{
+    font-size:12px;
+    align-self:center;
+    background: rgba(255,255,255,0.02);
+    padding:4px 8px;
+    border-radius:8px;
+    font-weight:800;
+    margin-top:4px;
+  }
+
+  /* type colors */
+  .slot.lecture{ background: linear-gradient(135deg, rgba(99,102,241,0.18), rgba(6,182,212,0.06)); border:1px solid rgba(99,102,241,0.12)}
+  .slot.practice{ background: linear-gradient(135deg, rgba(251,146,60,0.10), rgba(249,115,22,0.04)); border:1px solid rgba(249,115,22,0.12)}
+  .slot.lab{ background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(5,150,105,0.04)); border:1px solid rgba(5,150,105,0.12)}
+
+  /* title and time inside slot */
+  .slot .title{
+    display:block;
+    width:100%;
+    text-align:center;
+    font-size:14px;
+    line-height:1.1;
+    white-space:normal;
+    word-break:normal; /* prefer breaking between words */
+    overflow-wrap:break-word;
+    hyphens:none;
+  }
+  .slot .time {
+    font-size:12px;
+    color:var(--muted);
+    text-align:center;
+    margin-top:auto; /* keep time at bottom */
+    padding-top:6px;
+  }
+
+  /* current time line */
+  .now-line{
+    position:absolute;
+    left:0;
+    right:0;
+    height:2px;
+    background: var(--now-line);
+    transform-origin:left;
+    z-index:30;
+    box-shadow: 0 0 12px var(--now-line);
+  }
+  .now-dot{
+    position:absolute;
+    width:10px;height:10px;border-radius:50%;
+    background:var(--now-line); right:6px; top:-4px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.3);
+  }
+
+  /* menu burger and side menu */
+  .burger{
+    width:42px;height:42px;border-radius:10px;display:grid;place-items:center;
+    cursor:pointer;border:1px solid rgba(255,255,255,0.04);
+    background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent)
+  }
+  .side-menu{
+    position:fixed;
+    top:0;right:-380px;
+    width:360px;height:100vh;
+    background:var(--card);
+    box-shadow: -20px 0 60px rgba(2,6,23,0.6);
+    transition:right 360ms cubic-bezier(.2,.9,.3,1);
+    padding:18px;
+    z-index:80;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .side-menu.open{ right:0; }
+  .side-menu a{ color:var(--text); text-decoration:none; font-weight:700; padding:10px 12px; border-radius:8px; display:block }
+  .side-menu a:hover{ background:rgba(255,255,255,0.02) }
+
+  /* pages switching */
+  .page{ display:none }
+  .page.active{ display:block; animation: fadeIn .36s ease both; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none} }
+
+  /* small footer */
+  .footer{ margin-top:12px; color:var(--muted); font-size:13px; text-align:center }
+  a.link { color:inherit; text-decoration:underline dotted; }
+
+  /* made by bottom-left */
+  .made-by{ position:fixed; left:22px; bottom:14px; font-size:13px; color:var(--muted); z-index:90 }
+
+  /* responsive */
+  @media (max-width:980px){
+    .main{ grid-template-columns: 1fr; }
+    .sidebar{ order:2 }
+    .schedule-card{ order:1 }
+    .days-row .days{ grid-template-columns: repeat(4,1fr); font-size:13px }
+    .time-cell{font-size:11px}
+    .week-header{min-width:unset}
+    .epic{font-size:20px}
+  }
+</style>
+</head>
+<body>
+
+  <div class="header">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="brand">
+        <div class="epic">Розклад by Vitvor</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="week-header" id="weekHeader">
+        <div class="week-nav">
+          <button id="prevWeek" title="Попередній тиждень">‹</button>
+        </div>
+        <div id="weekTitle">завантаження...</div>
+        <div class="week-nav">
+          <button id="nextWeek" title="Наступний тиждень">›</button>
+        </div>
+      </div>
+
+      <!-- moved Сьогодні button here, so it sits next to week title -->
+      <button id="todayBtnHeader" style="padding:10px;border-radius:10px;border:0;background:var(--accent-solid);color:white;font-weight:700;cursor:pointer">Сьогодні</button>
+
+      <button class="theme-toggle" id="themeBtn" title="Переключити тему">Тема</button>
+
+      <div class="burger" id="burger" title="Меню">
+        <svg width="20" height="14" viewBox="0 0 24 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="2" rx="1" fill="currentColor"/><rect y="7" width="24" height="2" rx="1" fill="currentColor" opacity="0.9"/><rect y="14" width="24" height="2" rx="1" fill="currentColor" opacity="0.7"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <aside class="sidebar">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-weight:800;font-size:16px">Легенда</div>
+          <div style="color:var(--muted);font-size:13px">Типи занять</div>
+        </div>
+        <div style="font-size:12px;color:var(--muted)"><span id="localTime">--:--</span></div>
+      </div>
+
+      <div class="legend" style="margin-top:12px">
+        <div class="item"><div class="chip l"></div><div style="font-weight:700">Лек</div></div>
+        <div class="item"><div class="chip p"></div><div style="font-weight:700">Прак</div></div>
+        <div class="item"><div class="chip lab"></div><div style="font-weight:700">Лаб</div></div>
+      </div>
+
+      <!-- removed control/corner explanatory text per request -->
+
+    </aside>
+
+    <section class="schedule-card">
+      <div class="page active" id="page-schedule">
+        <div class="days-row">
+          <div style="font-size:13px;color:var(--muted)">Час</div>
+          <div class="days" id="dayHeaders"></div>
+        </div>
+
+        <div class="grid-wrap">
+          <div class="time-col" id="timeCol"></div>
+          <div class="days-grid">
+            <div class="col-days" id="cols"></div>
+            <div class="now-line" id="nowLine" style="display:none"><div class="now-dot"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-calendar">
+        <h3 style="margin-top:6px">Графік навчального процесу — ключові дати</h3>
+        <div style="margin-top:10px;color:var(--muted);line-height:1.6">
+          <strong>Перший (осінній) семестр 2025/2026</strong>
+          <ul>
+            <li>Перший календарний контроль: 13.10–19.10.2025</li>
+            <li>Другий календарний контроль: 24.11–30.11.2025</li>
+            <li>Семестровий контроль: 15.12–31.12.2025</li>
+            <li>Ліквідація академічної заборгованості: 19.01–25.01.2026</li>
+            <li>Канікули: 01.01–01.02.2026</li>
+          </ul>
+
+          <strong>Другий (весняний) семестр 2025/2026</strong>
+          <ul>
+            <li>Перший календарний контроль: 16.03–22.03.2026</li>
+            <li>Другий календарний контроль: 27.04–03.05.2026</li>
+            <li>Семестровий контроль: 18.05–07.06.2026</li>
+            <li>Ліквідація академічної заборгованості: 15.06–21.06.2026</li>
+            <li>Канікули: 08.06–01.09.2026</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer">Переключайте сторінки через меню вгорі праворуч • Натисніть на блок, щоб відкрити посилання</div>
+    </section>
+  </div>
+
+  <!-- Side menu -->
+  <div class="side-menu" id="sideMenu" aria-hidden="true">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="font-weight:800;font-size:16px">Меню</div>
+      <button id="closeMenu" style="background:transparent;border:0;color:var(--muted);cursor:pointer">✕</button>
+    </div>
+    <nav style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
+      <a href="#" data-target="page-schedule" class="menu-link">Розклад by Vitvor</a>
+      <a href="#" data-target="page-calendar" class="menu-link">Графік навчального процесу</a>
+    </nav>
+    <div style="margin-top:auto;color:var(--muted);font-size:13px">
+      Порада: користуйтеся стрілками або кнопкою «Сьогодні» для навігації між тижнями.
+    </div>
+  </div>
+
+  <div class="made-by">Made with ❤️ — Vitvor</div>
+
+<script>
+(() => {
+  // ---------- configuration ----------
+  const locale = 'uk-UA';
+  const days = ['пн','вт','ср','чт'];
+  const monthGen = ['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
+
+  const pairs = [
+    {id:1, start:'08:30', end:'10:05'},
+    {id:2, start:'10:25', end:'12:00'},
+    {id:3, start:'12:20', end:'13:55'},
+    {id:4, start:'14:15', end:'15:50'},
+    {id:5, start:'16:10', end:'17:45'}
+  ];
+
+  // schedule data provided by user.
+  const schedule = {
+    1: {
+      1: [
+        {title:'Методи та технології ШІ', link:'https://us02web.zoom.us/j/3428560060?pwd=YTZ4Vm8xVTYzTGhzQk5ONGpTcmVSZz09', type:'lecture'},
+        {title:'Розробка мобіль застосувань під iOS', link:'#', type:'lecture', note:'Coming soon'},
+        {title:'Інформаційне забезпечення промислових роботів', link:'https://us04web.zoom.us/j/73496253590?pwd=4G5hOcm26EJXOKbvSMYxJwaMomqaB6.1', type:'lecture'},
+        {title:'Вступ до розробки програмного забезпечення', link:'https://us02web.zoom.us/j/9348446833?pwd=OHh0VVk4OGhaQjRFdTZLRWlhRmFYZz09&omn=82446664963', type:'lecture'}
+      ],
+      2: [
+        {title:'Архітектура комп\'ютерів', link:'https://bbb.comsys.kpi.ua/rooms/iry-7ds-r3u-otz/join', type:'lecture'},
+        {title:'Паралельне програмування', link:'https://bbb.comsys.kpi.ua/rooms/juh-kcx-vn5-j1o/join', type:'lecture'},
+        {title:'Комп\'ютерні мережі', link:'https://us02web.zoom.us/j/3650838587?pwd=6he7zSms1SIKs82FME8PubaRsNaSRi.1', type:'lecture'},
+        {title:'Комп\'ютерні мережі', link:'https://us02web.zoom.us/j/3650838587?pwd=6he7zSms1SIKs82FME8PubaRsNaSRi.1', type:'lecture'}
+      ],
+      3: [
+        {title:'Методи та технології штучного інтелекту', link:'https://us04web.zoom.us/j/2261271006?pwd=TnlXbDd4MWNNbDcvWm4rL1VxNjZFUT09&omn=75814527152', type:'lab'},
+        {title:'Інформаційне забезпечення промислових роботів', link:'https://us05web.zoom.us/j/5673966902?pwd=VnVhSVk2YUdKSEZSSTFhRTFuR1VDZz09', type:'lab'}
+      ],
+      4: [
+        {title:'Правознавство (практика)', link:'#', type:'practice', note:'Coming soon'},
+        null,
+        null,
+        {title:'Паралельне програмування (лабораторна)', link:'https://bbb.comsys.kpi.ua/rooms/juh-kcx-vn5-j1o/join', type:'lab'}
+      ]
+    },
+    2: {
+      1: [
+        {title:'Методи та технології ШІ', link:'https://us02web.zoom.us/j/3428560060?pwd=YTZ4Vm8xVTYzTGhzQk5ONGpTcmVSZz09', type:'lecture'},
+        {title:'Розробка мобіль застосувань під iOS', link:'#', type:'lecture', note:'Coming soon'},
+        {title:'Інформаційне забезпечення промислових роботів', link:'https://us04web.zoom.us/j/73496253590?pwd=4G5hOcm26EJXOKbvSMYxJwaMomqaB6.1', type:'lecture'},
+        {title:'Вступ до розробки програмного забезпечення', link:'https://us02web.zoom.us/j/9348446833?pwd=OHh0VVk4OGhaQjRFdTZLRWlhRmFYZz09&omn=82446664963', type:'lecture'},
+        {title:'Розробка мобіль застосувань під iOS', link:'#', type:'lecture', note:'Coming soon'}
+      ],
+      2: [
+        {title:'Архітектура комп\'ютерів', link:'https://bbb.comsys.kpi.ua/rooms/iry-7ds-r3u-otz/join', type:'lecture'},
+        {title:'Паралельне програмування', link:'https://bbb.comsys.kpi.ua/rooms/juh-kcx-vn5-j1o/join', type:'lecture'},
+        {title:'Комп\'ютерні мережі', link:'https://us02web.zoom.us/j/3650838587?pwd=6he7zSms1SIKs82FME8PubaRsNaSRi.1', type:'lecture'},
+        {title:'Правознавство', link:'https://us05web.zoom.us/j/8589662326?pwd=L3dGcUs5WFVHdnlOb1ZkUlV1dmdLZz09', type:'lecture'}
+      ],
+      3: [
+        null,
+        null,
+        {title:'Вступ до розробки програмного забезпечення', link:'https://us02web.zoom.us/j/9348446833?pwd=OHh0VVk4OGhaQjRFdTZLRWlhRmFYZz09&omn=82446664963', type:'lab'},
+        {title:'Розробка мобіль застосувань під iOS', link:'#', type:'lab', note:'Coming soon'}
+      ],
+      4: [
+        {title:'Комп\'ютерні мережі (лабораторна)', link:'https://us04web.zoom.us/j/4122071690?pwd=zBWMjvT1aWKoJYX8bKRaJaz05H6afG.1', type:'lab'}
+      ]
+    }
+  };
+
+  // ---------- helper functions ----------
+  function parseHM(hm){
+    const [h,m] = hm.split(':').map(Number);
+    return h*60 + m;
+  }
+  const dayStart = 8*60; // 08:00
+  const dayEnd = 18*60;  // 18:00
+  const totalMin = dayEnd - dayStart;
+  const hourPx = 64; // set in CSS; ensure harmony with col height
+  const gridHeightPx = ( (dayEnd - dayStart) / 60 ) * hourPx;
+
+  // ---------- initial DOM references ----------
+  const dayHeaders = document.getElementById('dayHeaders');
+  const cols = document.getElementById('cols');
+  const timeCol = document.getElementById('timeCol');
+  const weekTitle = document.getElementById('weekTitle');
+  const weekHeader = document.getElementById('weekHeader');
+  const nowLine = document.getElementById('nowLine');
+  const localTimeSpan = document.getElementById('localTime');
+
+  // render time column
+  function renderTimeCol(){
+    timeCol.innerHTML = '';
+    for(let h=8; h<=18; h++){
+      const cell = document.createElement('div');
+      cell.className = 'time-cell';
+      cell.style.height = hourPx + 'px';
+      cell.textContent = (h<10? '0'+h : h) + ':00';
+      timeCol.appendChild(cell);
+    }
+  }
+
+  // compute monday of a given date
+  function mondayOf(date){
+    const d = new Date(date);
+    const day = (d.getDay() + 6) % 7; // Monday=0
+    d.setDate(d.getDate() - day);
+    d.setHours(0,0,0,0);
+    return d;
+  }
+
+  // format date dd.mm
+  function fmtDayShort(d){
+    const dd = String(d.getDate()).padStart(2,'0');
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    return dd + '.' + mm;
+  }
+
+  function fmtRange(monday){
+    const start = new Date(monday);
+    const end = new Date(monday);
+    end.setDate(end.getDate() + 6);
+    const startDay = start.getDate();
+    const endDay = end.getDate();
+    if (start.getMonth() === end.getMonth()){
+      return `${startDay} - ${endDay} ${monthGen[start.getMonth()]}`;
+    } else {
+      return `${startDay} ${monthGen[start.getMonth()]} - ${endDay} ${monthGen[end.getMonth()]}`;
+    }
+  }
+
+  // compute parity: ISO week number % 2 => week 1 or 2
+  function isoWeekNumber(d){
+    const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dayNum = date.getUTCDay() || 7;
+    date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
+    const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1)/7);
+    return weekNo;
+  }
+
+  // ---------- NEW: compute parity with September override ----------
+  function rangesOverlap(aStart,aEnd,bStart,bEnd){
+    return aStart.getTime() <= bEnd.getTime() && bStart.getTime() <= aEnd.getTime();
+  }
+
+  function computeParity(monday){
+    const year = monday.getFullYear();
+    const weekStart = new Date(monday);
+    const weekEnd = new Date(monday);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+
+    const sep1 = new Date(year, 8, 1);  // Sept 1
+    const sep7 = new Date(year, 8, 7);  // Sept 7
+    const sep8 = new Date(year, 8, 8);  // Sept 8
+    const sep14 = new Date(year, 8, 14);// Sept 14
+
+    if (rangesOverlap(weekStart, weekEnd, sep1, sep7)) return 1;
+    if (rangesOverlap(weekStart, weekEnd, sep8, sep14)) return 2;
+
+    const iso = isoWeekNumber(monday);
+    return (iso % 2) === 1 ? 1 : 2;
+  }
+
+  // render day headers with dates
+  function renderDayHeaders(monday){
+    dayHeaders.innerHTML = '';
+    for(let i=0;i<4;i++){
+      const d = new Date(monday);
+      d.setDate(d.getDate()+i);
+      const el = document.createElement('div');
+      el.className = 'day-head' + (isSameDate(d,new Date()) ? ' today' : '');
+      el.innerHTML = `<div style="font-size:15px">${days[i]}</div><small>${fmtDayShort(d)}</small>`;
+      dayHeaders.appendChild(el);
+    }
+  }
+
+  function isSameDate(a,b){
+    return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+  }
+
+  // map type label (kept for internal use but we won't render it)
+  function shortType(t){
+    if(!t) return '';
+    if(t==='lecture') return 'лек';
+    if(t==='practice') return 'прак';
+    if(t==='lab') return 'лаб';
+    return t;
+  }
+
+  // render columns and slots based on week parity
+  function renderGrid(monday, weekParity){
+    cols.innerHTML = '';
+    cols.style.height = gridHeightPx + 'px';
+    const colsFrag = document.createDocumentFragment();
+    for(let c=0;c<4;c++){
+      const col = document.createElement('div');
+      col.className = 'col';
+      col.style.position = 'relative';
+      col.setAttribute('data-day-index', c);
+      col.style.minHeight = gridHeightPx + 'px';
+      colsFrag.appendChild(col);
+    }
+    cols.appendChild(colsFrag);
+
+    const weekData = schedule[weekParity] || {};
+    for(let di=0; di<4; di++){
+      const dayCol = cols.querySelector(`.col[data-day-index="${di}"]`);
+      const dayIndex = di + 1;
+      for(let p=0;p<pairs.length;p++){
+        const pair = pairs[p];
+        const dayArr = weekData[dayIndex] || [];
+        let item = null;
+        if (Array.isArray(dayArr) && dayArr[p]) item = dayArr[p];
+        if (!item && typeof weekData[dayIndex] === 'object' && !Array.isArray(weekData[dayIndex])){
+          item = weekData[dayIndex][p+1] || null;
+        }
+        if (item){
+          const sMin = parseHM(pair.start);
+          const eMin = parseHM(pair.end);
+          const topPerc = ((sMin - dayStart) / totalMin) * 100;
+          const heightPerc = ((eMin - sMin) / totalMin) * 100;
+          const slot = document.createElement('a');
+          slot.className = 'slot ' + (item.type === 'lecture' ? 'lecture' : item.type === 'lab' ? 'lab' : 'practice');
+          slot.style.top = topPerc + '%';
+          slot.style.height = heightPerc + '%';
+          slot.href = item.link && item.link !== '#' ? item.link : 'javascript:void(0)';
+          slot.target = '_blank';
+          slot.rel = 'noopener noreferrer';
+
+          // structure: title on top center, optional note, time bottom center
+          const title = document.createElement('div');
+          title.className = 'title';
+          title.textContent = item.title;
+
+          const note = document.createElement('div');
+          note.className = 'meta';
+          note.textContent = item.note || '';
+
+          // NOTE: per request, DO NOT render the 'type' element (short labels like "лек", "прак", "лаб")
+          // const type = document.createElement('div');
+          // type.className = 'type';
+          // type.textContent = shortType(item.type);
+
+          const time = document.createElement('div');
+          time.className = 'time';
+          time.textContent = `${pair.start} — ${pair.end}`;
+
+          slot.appendChild(title);
+          if(item.note) slot.appendChild(note);
+          // intentionally NOT appending type
+          slot.appendChild(time);
+
+          dayCol.appendChild(slot);
+
+          if (!item.link || item.link === '#'){
+            slot.addEventListener('click', (e) => {
+              e.preventDefault();
+              alert('Посилання поки що не доступне (Coming soon).');
+            });
+          }
+        }
+      }
+    }
+  }
+
+  // update week title (range + parity)
+  function updateWeekTitle(monday){
+    const range = fmtRange(monday);
+    const parity = computeParity(monday);
+    weekTitle.innerHTML = `<div style="text-align:center">${range}, <span style="color:var(--muted)">${parity} тиждень</span></div>`;
+  }
+
+  // draw now line
+  function updateNowLine(baseMonday){
+    const now = new Date();
+    const monday = new Date(baseMonday);
+    const dayDiff = Math.floor((now - monday) / (24*3600*1000));
+    const show = now.getHours()*60 + now.getMinutes() >= dayStart && now.getHours()*60 + now.getMinutes() <= dayEnd && dayDiff >=0 && dayDiff < 4;
+    if (!show){
+      nowLine.style.display = 'none';
+      return;
+    }
+    nowLine.style.display = 'block';
+    const minutesFromStart = now.getHours()*60 + now.getMinutes() - dayStart;
+    const topPx = (minutesFromStart / totalMin) * gridHeightPx;
+    nowLine.style.top = (topPx + 10) + 'px';
+  }
+
+  renderTimeCol();
+
+  let currentMonday = mondayOf(new Date());
+  document.getElementById('prevWeek').addEventListener('click', () => {
+    currentMonday.setDate(currentMonday.getDate() - 7);
+    refresh();
+  });
+  document.getElementById('nextWeek').addEventListener('click', () => {
+    currentMonday.setDate(currentMonday.getDate() + 7);
+    refresh();
+  });
+  document.getElementById('todayBtnHeader').addEventListener('click', () => {
+    currentMonday = mondayOf(new Date());
+    refresh();
+  });
+
+  const themeBtn = document.getElementById('themeBtn');
+  const userTheme = localStorage.getItem('theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark');
+  document.documentElement.setAttribute('data-theme', userTheme);
+  themeBtn.textContent = userTheme === 'light' ? 'Світла' : 'Темна';
+  themeBtn.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    const next = cur === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    themeBtn.textContent = next === 'light' ? 'Світла' : 'Темна';
+  });
+
+  const burger = document.getElementById('burger');
+  const sideMenu = document.getElementById('sideMenu');
+  const closeMenu = document.getElementById('closeMenu');
+  burger.addEventListener('click', ()=> sideMenu.classList.add('open'));
+  closeMenu.addEventListener('click', ()=> sideMenu.classList.remove('open'));
+  sideMenu.addEventListener('click', (e) => {
+    if (e.target.classList.contains('menu-link')){
+      e.preventDefault();
+      const target = e.target.getAttribute('data-target');
+      document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+      document.getElementById(target).classList.add('active');
+      sideMenu.classList.remove('open');
+    }
+  });
+
+  function refresh(){
+    renderDayHeaders(currentMonday);
+    const parity = computeParity(currentMonday);
+    renderGrid(currentMonday, parity);
+    updateWeekTitle(currentMonday);
+    updateNowLine(currentMonday);
+  }
+  refresh();
+
+  function tick(){
+    const now = new Date();
+    localTimeSpan.textContent = now.toLocaleTimeString(locale, {hour:'2-digit',minute:'2-digit'});
+    updateNowLine(currentMonday);
+  }
+  tick();
+  setInterval(tick,15000);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') sideMenu.classList.remove('open');
+  });
+})();
+</script>
+
+</body>
+</html>
