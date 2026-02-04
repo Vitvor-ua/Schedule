@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Розклад by Vitvor</title>
+<title>Розклад</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
 
@@ -38,7 +38,6 @@
   body{
     margin:0;
     font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,"Helvetica Neue",Arial;
-    /* softened radial accents to avoid strong pink banding */
     background: radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.04), transparent),
                 radial-gradient(900px 500px at 90% 90%, rgba(6,182,212,0.03), transparent),
                 var(--bg);
@@ -49,7 +48,6 @@
     transition:background 300ms,color 300ms;
   }
 
-  /* Header - increased height so fancy text fits */
   .header{
     display:flex;
     align-items:center;
@@ -67,7 +65,7 @@
   .epic{
     font-weight:900;
     letter-spacing:0.6px;
-    font-size:26px; /* a bit larger */
+    font-size:26px;
     line-height:1;
     background: var(--accent);
     -webkit-background-clip: text;
@@ -118,7 +116,6 @@
     font-weight:600;
   }
 
-  /* Layout */
   .main{
     display:grid;
     grid-template-columns:220px 1fr;
@@ -126,7 +123,6 @@
     align-items:start;
   }
 
-  /* Sidebar small info / legend */
   .sidebar{
     background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
     padding:14px;
@@ -141,9 +137,6 @@
   .chip.p{background:linear-gradient(90deg,#fb923c,#f97316)}
   .chip.lab{background:linear-gradient(90deg,#10b981,#059669)}
 
-  .side-title{font-size:13px;color:var(--muted);margin-top:14px}
-
-  /* Schedule area */
   .schedule-card{
     background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
     padding:14px;
@@ -179,7 +172,6 @@
   }
   .day-head small{display:block;font-weight:500;color:var(--muted);font-size:12px;margin-top:6px}
 
-  /* grid */
   .grid-wrap{
     display:flex;
     gap:12px;
@@ -193,7 +185,7 @@
     padding-top:10px;
   }
   .time-cell{
-    height:64px; /* 1 hour segment = 64px (we'll map minutes to px) */
+    height:64px;
     display:flex;
     align-items:flex-start;
     justify-content:flex-end;
@@ -215,7 +207,7 @@
     grid-template-columns: repeat(4,1fr);
     gap:8px;
     position:relative;
-    height: 10 * 64px; /* 10 hours (8..18) => 10 * height per hour */
+    height: 10 * 64px;
   }
   .col{
     position:relative;
@@ -228,7 +220,6 @@
     );
   }
 
-  /* Slot styling changed to div to support nested clickables */
   .slot{
     position:absolute;
     left:6%;
@@ -252,25 +243,12 @@
   .slot:hover{ transform: translateY(-6px); box-shadow: 0 18px 40px rgba(2,6,23,0.6); }
 
   .slot .meta{font-size:12px;color:var(--muted); font-weight:600; text-align: center; z-index: 2;}
-  /* Link inside meta needs to pop */
   .slot .meta a:hover { color: var(--text); }
 
-  .slot .type{
-    font-size:12px;
-    align-self:center;
-    background: rgba(255,255,255,0.02);
-    padding:4px 8px;
-    border-radius:8px;
-    font-weight:800;
-    margin-top:4px;
-  }
-
-  /* type colors */
   .slot.lecture{ background: linear-gradient(135deg, rgba(99,102,241,0.18), rgba(6,182,212,0.06)); border:1px solid rgba(99,102,241,0.12)}
   .slot.practice{ background: linear-gradient(135deg, rgba(251,146,60,0.10), rgba(249,115,22,0.04)); border:1px solid rgba(249,115,22,0.12)}
   .slot.lab{ background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(5,150,105,0.04)); border:1px solid rgba(5,150,105,0.12)}
 
-  /* title and time inside slot */
   .slot .title{
     display:block;
     width:100%;
@@ -278,19 +256,20 @@
     font-size:14px;
     line-height:1.1;
     white-space:normal;
-    word-break:normal; /* prefer breaking between words */
+    word-break:normal;
     overflow-wrap:break-word;
     hyphens:none;
+    /* Added per request: underline text */
+    text-decoration: underline; 
   }
   .slot .time {
     font-size:12px;
     color:var(--muted);
     text-align:center;
-    margin-top:auto; /* keep time at bottom */
+    margin-top:auto;
     padding-top:6px;
   }
 
-  /* current time line */
   .now-line{
     position:absolute;
     left:0;
@@ -308,7 +287,6 @@
     box-shadow:0 4px 14px rgba(0,0,0,0.3);
   }
 
-  /* menu burger and side menu */
   .burger{
     width:42px;height:42px;border-radius:10px;display:grid;place-items:center;
     cursor:pointer;border:1px solid rgba(255,255,255,0.04);
@@ -328,22 +306,18 @@
     gap:12px;
   }
   .side-menu.open{ right:0; }
-  .side-menu a{ color:var(--text); text-decoration:none; font-weight:700; padding:10px 12px; border-radius:8px; display:block }
+  .side-menu a{ color:var(--text); text-decoration:none; font-weight:700; padding:10px 12px; border-radius:8px; display:block; cursor: pointer; }
   .side-menu a:hover{ background:rgba(255,255,255,0.02) }
 
-  /* pages switching */
   .page{ display:none }
   .page.active{ display:block; animation: fadeIn .36s ease both; }
   @keyframes fadeIn{ from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none} }
 
-  /* small footer */
   .footer{ margin-top:12px; color:var(--muted); font-size:13px; text-align:center }
   a.link { color:inherit; text-decoration:underline dotted; }
 
-  /* made by bottom-left */
   .made-by{ position:fixed; left:22px; bottom:14px; font-size:13px; color:var(--muted); z-index:90 }
 
-  /* responsive */
   @media (max-width:980px){
     .main{ grid-template-columns: 1fr; }
     .sidebar{ order:2 }
@@ -360,7 +334,7 @@
   <div class="header">
     <div style="display:flex;align-items:center;gap:12px">
       <div class="brand">
-        <div class="epic">Розклад by Vitvor</div>
+        <div class="epic" id="headerTitle">Розклад by Vitvor</div>
       </div>
     </div>
 
@@ -400,8 +374,7 @@
         <div class="item"><div class="chip p"></div><div style="font-weight:700">Прак</div></div>
         <div class="item"><div class="chip lab"></div><div style="font-weight:700">Лаб</div></div>
       </div>
-
-      </aside>
+    </aside>
 
     <section class="schedule-card">
       <div class="page active" id="page-schedule">
@@ -446,8 +419,9 @@
       <button id="closeMenu" style="background:transparent;border:0;color:var(--muted);cursor:pointer">✕</button>
     </div>
     <nav style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
-      <a href="#" data-target="page-schedule" class="menu-link">Розклад by Vitvor</a>
-      <a href="#" data-target="page-calendar" class="menu-link">Графік навчального процесу</a>
+      <a class="menu-action" data-user="vitvor">Розклад by Vitvor</a>
+      <a class="menu-action" data-user="artem">Графік для Артема</a>
+      <a class="menu-action" data-page="page-calendar">Графік навчального процесу</a>
     </nav>
     <div style="margin-top:auto;color:var(--muted);font-size:13px">
       Порада: користуйтеся стрілками або кнопкою «Сьогодні» для навігації між тижнями.
@@ -471,8 +445,8 @@
     {id:5, start:'16:10', end:'17:45'}
   ];
 
-  // schedule data provided by user.
-  const schedule = {
+  // VITVOR SCHEDULE
+  const scheduleVitvor = {
     1: {
       1: [
         {title:'Обробка та аналіз текстових даних на Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
@@ -531,15 +505,59 @@
     }
   };
 
+  // ARTEM SCHEDULE
+  const scheduleArtem = {
+    1: {
+      1: [
+        {title:'Обробка та аналіз текстових даних на Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
+        {title:'Аналіз даних з використанням мови Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
+        // REPLACED: 3 pair Monday
+        {title:'Програмні засоби проектування та реалізації нейромережевих систем', link:'https://us02web.zoom.us/j/3428560060?pwd=YTZ4Vm8xVTYzTGhzQk5ONGpTcmVSZz09', type:'lecture'},
+        {title:'Сучасні операційні системи', link:'https://us02web.zoom.us/j/5249202812?pwd=ci96MGpqNG1yU3B2aXdMbzcrWU1ndz09', type:'lecture'}
+      ],
+      2: scheduleVitvor[1][2], // Same as Vitvor
+      3: scheduleVitvor[1][3], // Same as Vitvor
+      4: [
+        // ADDED: 1 pair Thursday (Lab)
+        {title:'Програмні засоби проектування та реалізації нейромережевих систем', link:'https://us02web.zoom.us/j/3428560060?pwd=YTZ4Vm8xVTYzTGhzQk5ONGpTcmVSZz09', type:'lab'},
+        {title:'Сучасні операційні системи', link:'https://us02web.zoom.us/j/5249202812?pwd=ci96MGpqNG1yU3B2aXdMbzcrWU1ndz09', type:'lab'}
+      ]
+    },
+    2: {
+      1: [
+        {title:'Обробка та аналіз текстових даних на Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
+        {title:'Аналіз даних з використанням мови Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
+        // REPLACED: 3 pair Monday
+        {title:'Програмні засоби проектування та реалізації нейромережевих систем', link:'https://us02web.zoom.us/j/3428560060?pwd=YTZ4Vm8xVTYzTGhzQk5ONGpTcmVSZz09', type:'lecture'},
+        {title:'Сучасні операційні системи', link:'https://us02web.zoom.us/j/5249202812?pwd=ci96MGpqNG1yU3B2aXdMbzcrWU1ndz09', type:'lecture'}
+      ],
+      2: scheduleVitvor[2][2], // Same
+      3: scheduleVitvor[2][3], // Same
+      4: [
+        null,
+        {title:'Аналіз даних з використанням мови Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lab'},
+        {title:'Обробка та аналіз текстових даних на Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lab'}
+        // REMOVED: AI Lab (4th pair)
+      ]
+    }
+  };
+
+  const schedules = {
+    'vitvor': scheduleVitvor,
+    'artem': scheduleArtem
+  };
+
+  let activeUser = 'vitvor'; // default
+
   // ---------- helper functions ----------
   function parseHM(hm){
     const [h,m] = hm.split(':').map(Number);
     return h*60 + m;
   }
-  const dayStart = 8*60; // 08:00
-  const dayEnd = 18*60;  // 18:00
+  const dayStart = 8*60; 
+  const dayEnd = 18*60;
   const totalMin = dayEnd - dayStart;
-  const hourPx = 64; // set in CSS; ensure harmony with col height
+  const hourPx = 64; 
   const gridHeightPx = ( (dayEnd - dayStart) / 60 ) * hourPx;
 
   // ---------- initial DOM references ----------
@@ -550,6 +568,7 @@
   const weekHeader = document.getElementById('weekHeader');
   const nowLine = document.getElementById('nowLine');
   const localTimeSpan = document.getElementById('localTime');
+  const headerTitle = document.getElementById('headerTitle');
 
   // render time column
   function renderTimeCol(){
@@ -566,7 +585,7 @@
   // compute monday of a given date
   function mondayOf(date){
     const d = new Date(date);
-    const day = (d.getDay() + 6) % 7; // Monday=0
+    const day = (d.getDay() + 6) % 7; 
     d.setDate(d.getDate() - day);
     d.setHours(0,0,0,0);
     return d;
@@ -592,29 +611,14 @@
     }
   }
 
-  // compute parity: ISO week number % 2 => week 1 or 2
-  function isoWeekNumber(d){
-    const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-    const dayNum = date.getUTCDay() || 7;
-    date.setUTCDate(date.getUTCDate() + 4 - dayNum);
-    const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
-    const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1)/7);
-    return weekNo;
-  }
-
-  // ---- compute parity anchored so week containing Sep 1 is treated as parity 1 ----
   function computeParity(monday){
-    // reference = monday of the week that contains Sept 1 for the relevant academic year
     const year = monday.getFullYear();
-    // monday that contains Sep 1 in same year
-    let refMonday = mondayOf(new Date(year, 8, 1)); // Sept = month 8
-    // if current monday is before that reference, use previous year's Sept 1 week as reference
+    let refMonday = mondayOf(new Date(year, 8, 1)); 
     if (monday < refMonday){
       refMonday = mondayOf(new Date(year - 1, 8, 1));
     }
     const msPerWeek = 7 * 24 * 60 * 60 * 1000;
     const diffWeeks = Math.round((monday.getTime() - refMonday.getTime()) / msPerWeek);
-    // even difference => same parity as reference (reference = 1), odd => opposite (2)
     return (diffWeeks % 2 === 0) ? 1 : 2;
   }
 
@@ -635,7 +639,7 @@
     return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
   }
 
-  // render columns and slots based on week parity
+  // render columns and slots based on week parity and active user
   function renderGrid(monday, weekParity){
     cols.innerHTML = '';
     cols.style.height = gridHeightPx + 'px';
@@ -650,7 +654,10 @@
     }
     cols.appendChild(colsFrag);
 
-    const weekData = schedule[weekParity] || {};
+    // Pick data based on Active User
+    const currentScheduleData = schedules[activeUser];
+    const weekData = currentScheduleData[weekParity] || {};
+
     for(let di=0; di<4; di++){
       const dayCol = cols.querySelector(`.col[data-day-index="${di}"]`);
       const dayIndex = di + 1;
@@ -668,22 +675,18 @@
           const topPerc = ((sMin - dayStart) / totalMin) * 100;
           const heightPerc = ((eMin - sMin) / totalMin) * 100;
           
-          // create DIV instead of A to allow nested clickable elements
           const slot = document.createElement('div');
           slot.className = 'slot ' + (item.type === 'lecture' ? 'lecture' : item.type === 'lab' ? 'lab' : 'practice');
           slot.style.top = topPerc + '%';
           slot.style.height = heightPerc + '%';
           
-          // Title
           const title = document.createElement('div');
           title.className = 'title';
           title.textContent = item.title;
 
-          // Note / Link
           const note = document.createElement('div');
           note.className = 'meta';
           if(item.noteLink) {
-             // Create an actual link for the note that stops propagation
              const noteAnchor = document.createElement('a');
              noteAnchor.href = item.noteLink;
              noteAnchor.target = '_blank';
@@ -692,7 +695,6 @@
              noteAnchor.style.color = 'inherit';
              noteAnchor.style.textDecoration = 'underline dotted';
              
-             // Stop propagation so clicking this doesn't trigger the main slot click
              noteAnchor.addEventListener('click', (e) => {
                e.stopPropagation();
              });
@@ -711,11 +713,8 @@
 
           dayCol.appendChild(slot);
 
-          // Handle main click on the slot
           slot.addEventListener('click', (e) => {
-            // Check if we didn't click the inner link (though stopPropagation handles it, this is extra safety)
             if(e.target.tagName === 'A') return;
-
             if (!item.link || item.link === '#'){
               e.preventDefault();
               alert('Посилання поки що не доступне (Coming soon).');
@@ -728,14 +727,12 @@
     }
   }
 
-  // update week title (range + parity)
   function updateWeekTitle(monday){
     const range = fmtRange(monday);
     const parity = computeParity(monday);
     weekTitle.innerHTML = `<div style="text-align:center">${range}, <span style="color:var(--muted)">${parity} тиждень</span></div>`;
   }
 
-  // draw now line
   function updateNowLine(baseMonday){
     const now = new Date();
     const monday = new Date(baseMonday);
@@ -784,12 +781,35 @@
   const closeMenu = document.getElementById('closeMenu');
   burger.addEventListener('click', ()=> sideMenu.classList.add('open'));
   closeMenu.addEventListener('click', ()=> sideMenu.classList.remove('open'));
+  
+  // Updated Menu Logic
   sideMenu.addEventListener('click', (e) => {
-    if (e.target.classList.contains('menu-link')){
+    const actionEl = e.target.closest('.menu-action');
+    if (actionEl){
       e.preventDefault();
-      const target = e.target.getAttribute('data-target');
-      document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-      document.getElementById(target).classList.add('active');
+      
+      // Handle User Switch
+      if (actionEl.dataset.user) {
+        activeUser = actionEl.dataset.user;
+        
+        // Update Title
+        if (activeUser === 'vitvor') headerTitle.textContent = "Розклад by Vitvor";
+        if (activeUser === 'artem') headerTitle.textContent = "Графік для Артема";
+        
+        // Switch to Schedule Page
+        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+        document.getElementById('page-schedule').classList.add('active');
+        
+        refresh(); // Re-render grid
+      }
+      
+      // Handle Page Switch (Calendar)
+      if (actionEl.dataset.page) {
+        const target = actionEl.dataset.page;
+        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+        document.getElementById(target).classList.add('active');
+      }
+
       sideMenu.classList.remove('open');
     }
   });
