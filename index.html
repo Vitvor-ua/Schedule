@@ -228,6 +228,7 @@
     );
   }
 
+  /* Slot styling changed to div to support nested clickables */
   .slot{
     position:absolute;
     left:6%;
@@ -246,10 +247,14 @@
     gap:6px;
     transition: transform 200ms, box-shadow 200ms;
     cursor:pointer;
+    text-decoration: none;
   }
   .slot:hover{ transform: translateY(-6px); box-shadow: 0 18px 40px rgba(2,6,23,0.6); }
 
-  .slot .meta{font-size:12px;color:var(--muted); font-weight:600; text-align: center;}
+  .slot .meta{font-size:12px;color:var(--muted); font-weight:600; text-align: center; z-index: 2;}
+  /* Link inside meta needs to pop */
+  .slot .meta a:hover { color: var(--text); }
+
   .slot .type{
     font-size:12px;
     align-self:center;
@@ -370,7 +375,6 @@
         </div>
       </div>
 
-      <!-- moved Сьогодні button here, so it sits next to week title -->
       <button id="todayBtnHeader" style="padding:10px;border-radius:10px;border:0;background:var(--accent-solid);color:white;font-weight:700;cursor:pointer">Сьогодні</button>
 
       <button class="theme-toggle" id="themeBtn" title="Переключити тему">Тема</button>
@@ -397,9 +401,7 @@
         <div class="item"><div class="chip lab"></div><div style="font-weight:700">Лаб</div></div>
       </div>
 
-      <!-- removed control/corner explanatory text per request -->
-
-    </aside>
+      </aside>
 
     <section class="schedule-card">
       <div class="page active" id="page-schedule">
@@ -420,15 +422,7 @@
       <div class="page" id="page-calendar">
         <h3 style="margin-top:6px">Графік навчального процесу — ключові дати</h3>
         <div style="margin-top:10px;color:var(--muted);line-height:1.6">
-          <strong>Перший (осінній) семестр 2025/2026</strong>
-          <ul>
-            <li>Перший календарний контроль: 13.10–19.10.2025</li>
-            <li>Другий календарний контроль: 24.11–30.11.2025</li>
-            <li>Семестровий контроль: 15.12–31.12.2025</li>
-            <li>Ліквідація академічної заборгованості: 19.01–25.01.2026</li>
-            <li>Канікули: 01.01–01.02.2026</li>
-          </ul>
-
+          
           <strong>Другий (весняний) семестр 2025/2026</strong>
           <ul>
             <li>Перший календарний контроль: 16.03–22.03.2026</li>
@@ -437,6 +431,8 @@
             <li>Ліквідація академічної заборгованості: 15.06–21.06.2026</li>
             <li>Канікули: 08.06–01.09.2026</li>
           </ul>
+
+          <img src="calendar.jpg" alt="Календар семестру" style="display:block; max-width:100%; height:auto; border-radius:12px; box-shadow:var(--shadow); margin-top:20px;">
         </div>
       </div>
 
@@ -444,7 +440,6 @@
     </section>
   </div>
 
-  <!-- Side menu -->
   <div class="side-menu" id="sideMenu" aria-hidden="true">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <div style="font-weight:800;font-size:16px">Меню</div>
@@ -480,50 +475,58 @@
   const schedule = {
     1: {
       1: [
-        {title:'Методи та технології ШІ', link:'https://us02web.zoom.us/j/3428560060?pwd=YTZ4Vm8xVTYzTGhzQk5ONGpTcmVSZz09', type:'lecture'},
-        {title:'Розробка мобіль застосувань під iOS', link:'#', type:'lecture', note:'Coming soon'},
-        {title:'Інформаційне забезпечення промислових роботів', link:'https://us04web.zoom.us/j/73496253590?pwd=4G5hOcm26EJXOKbvSMYxJwaMomqaB6.1', type:'lecture'},
-        {title:'Вступ до розробки програмного забезпечення', link:'https://us02web.zoom.us/j/9348446833?pwd=OHh0VVk4OGhaQjRFdTZLRWlhRmFYZz09&omn=82446664963', type:'lecture'}
+        {title:'Обробка та аналіз текстових даних на Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
+        {title:'Аналіз даних з використанням мови Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
+        {title:'Методи та системи штучного інтелекту', link:'https://us04web.zoom.us/j/3939550950?pwd=b0M1M00zbGhmelUxQW13dTI5dkQ5UT09', type:'lecture'},
+        {title:'Сучасні операційні системи', link:'https://us02web.zoom.us/j/5249202812?pwd=ci96MGpqNG1yU3B2aXdMbzcrWU1ndz09', type:'lecture'}
       ],
       2: [
-        {title:'Архітектура комп\'ютерів', link:'https://bbb.comsys.kpi.ua/rooms/iry-7ds-r3u-otz/join', type:'lecture'},
-        {title:'Паралельне програмування', link:'https://bbb.comsys.kpi.ua/rooms/juh-kcx-vn5-j1o/join', type:'lecture'},
-        {title:'Комп\'ютерні мережі', link:'https://us02web.zoom.us/j/3650838587?pwd=6he7zSms1SIKs82FME8PubaRsNaSRi.1', type:'lecture'},
-        {title:'Комп\'ютерні мережі', link:'https://us02web.zoom.us/j/3650838587?pwd=6he7zSms1SIKs82FME8PubaRsNaSRi.1', type:'lecture'}
+        null,
+        {
+          title:'Системне програмне забезпечення', 
+          link:'https://bbb.comsys.kpi.ua/rooms/and-722-eja', 
+          type:'lecture',
+          note: 'Альтернатива meet',
+          noteLink: 'https://meet.google.com/qtq-hfws-aqk'
+        }
       ],
       3: [
-        {title:'Методи та технології штучного інтелекту', link:'https://us04web.zoom.us/j/2261271006?pwd=TnlXbDd4MWNNbDcvWm4rL1VxNjZFUT09&omn=75814527152', type:'lab'},
-        {title:'Інформаційне забезпечення промислових роботів', link:'https://us05web.zoom.us/j/5673966902?pwd=VnVhSVk2YUdKSEZSSTFhRTFuR1VDZz09', type:'lab'}
+        {title:'Архітектура комп\'ютерів', link:'https://us02web.zoom.us/j/5274433531?pwd=L5kbH2aNdFh4Xn4jhtbXG5AZnFKS6T.1', type:'lecture'},
+        {title:'Архітектура комп\'ютерів', link:'https://us02web.zoom.us/j/5274433531?pwd=L5kbH2aNdFh4Xn4jhtbXG5AZnFKS6T.1', type:'lab'},
+        {title:'Англійська', link:'https://us04web.zoom.us/j/78533274147?pwd=blwzUR3m7F0tSFtIEcgxSPjZOhbtYY.1', type:'practice'}
       ],
       4: [
-        {title:'Правознавство', link:'https://meet.google.com/nyj-ptfp-ihn', type:'practice'},
         null,
-        null,
-        {title:'Паралельне програмування', link:'https://bbb.comsys.kpi.ua/rooms/juh-kcx-vn5-j1o/join', type:'lab'}
+        {title:'Сучасні операційні системи', link:'https://us02web.zoom.us/j/5249202812?pwd=ci96MGpqNG1yU3B2aXdMbzcrWU1ndz09', type:'lab'}
       ]
     },
     2: {
       1: [
-        {title:'Методи та технології ШІ', link:'https://us02web.zoom.us/j/3428560060?pwd=YTZ4Vm8xVTYzTGhzQk5ONGpTcmVSZz09', type:'lecture'},
-        {title:'Розробка мобіль застосувань під iOS', link:'#', type:'lecture', note:'Coming soon'},
-        {title:'Інформаційне забезпечення промислових роботів', link:'https://us04web.zoom.us/j/73496253590?pwd=4G5hOcm26EJXOKbvSMYxJwaMomqaB6.1', type:'lecture'},
-        {title:'Вступ до розробки програмного забезпечення', link:'https://us02web.zoom.us/j/9348446833?pwd=OHh0VVk4OGhaQjRFdTZLRWlhRmFYZz09&omn=82446664963', type:'lecture'},
-        {title:'Розробка мобіль застосувань під iOS', link:'#', type:'lecture', note:'Coming soon'}
+        {title:'Обробка та аналіз текстових даних на Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
+        {title:'Аналіз даних з використанням мови Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
+        {title:'Методи та системи штучного інтелекту', link:'https://us04web.zoom.us/j/3939550950?pwd=b0M1M00zbGhmelUxQW13dTI5dkQ5UT09', type:'lecture'},
+        {title:'Сучасні операційні системи', link:'https://us02web.zoom.us/j/5249202812?pwd=ci96MGpqNG1yU3B2aXdMbzcrWU1ndz09', type:'lecture'}
       ],
       2: [
-        {title:'Архітектура комп\'ютерів', link:'https://bbb.comsys.kpi.ua/rooms/iry-7ds-r3u-otz/join', type:'lecture'},
-        {title:'Паралельне програмування', link:'https://bbb.comsys.kpi.ua/rooms/juh-kcx-vn5-j1o/join', type:'lecture'},
-        {title:'Комп\'ютерні мережі', link:'https://us02web.zoom.us/j/3650838587?pwd=6he7zSms1SIKs82FME8PubaRsNaSRi.1', type:'lecture'},
-        {title:'Правознавство', link:'https://us05web.zoom.us/j/8589662326?pwd=L3dGcUs5WFVHdnlOb1ZkUlV1dmdLZz09', type:'lecture'}
+        null,
+        {
+          title:'Системне програмне забезпечення', 
+          link:'https://bbb.comsys.kpi.ua/rooms/and-722-eja', 
+          type:'lecture',
+          note: 'Альтернатива meet',
+          noteLink: 'https://meet.google.com/qtq-hfws-aqk'
+        }
       ],
       3: [
-        null,
-        null,
-        {title:'Вступ до розробки програмного забезпечення', link:'https://us02web.zoom.us/j/9348446833?pwd=OHh0VVk4OGhaQjRFdTZLRWlhRmFYZz09&omn=82446664963', type:'lab'},
-        {title:'Розробка мобіль застосувань під iOS', link:'#', type:'lab', note:'Coming soon'}
+        {title:'Архітектура комп\'ютерів', link:'https://us02web.zoom.us/j/5274433531?pwd=L5kbH2aNdFh4Xn4jhtbXG5AZnFKS6T.1', type:'lecture'},
+        {title:'Системне програмне забезпечення', link:'https://us05web.zoom.us/j/6091939855?pwd=S2p5aEZSQlhKanJWZURRcDR0YkZ6UT09', type:'lab'},
+        {title:'Англійська', link:'https://us04web.zoom.us/j/78533274147?pwd=blwzUR3m7F0tSFtIEcgxSPjZOhbtYY.1', type:'practice'}
       ],
       4: [
-        {title:'Комп\'ютерні мережі', link:'https://us04web.zoom.us/j/4122071690?pwd=zBWMjvT1aWKoJYX8bKRaJaz05H6afG.1', type:'lab'}
+        null,
+        {title:'Аналіз даних з використанням мови Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lab'},
+        {title:'Обробка та аналіз текстових даних на Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lab'},
+        {title:'Методи та системи штучного інтелекту', link:'https://us05web.zoom.us/j/3769817683?pwd=OXFCbzZSbDRGcWlKNmpRTFY3U3NUQT09', type:'lab'}
       ]
     }
   };
@@ -632,15 +635,6 @@
     return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
   }
 
-  // map type label (kept for internal use but we won't render it)
-  function shortType(t){
-    if(!t) return '';
-    if(t==='lecture') return 'лек';
-    if(t==='practice') return 'прак';
-    if(t==='lab') return 'лаб';
-    return t;
-  }
-
   // render columns and slots based on week parity
   function renderGrid(monday, weekParity){
     cols.innerHTML = '';
@@ -673,27 +667,39 @@
           const eMin = parseHM(pair.end);
           const topPerc = ((sMin - dayStart) / totalMin) * 100;
           const heightPerc = ((eMin - sMin) / totalMin) * 100;
-          const slot = document.createElement('a');
+          
+          // create DIV instead of A to allow nested clickable elements
+          const slot = document.createElement('div');
           slot.className = 'slot ' + (item.type === 'lecture' ? 'lecture' : item.type === 'lab' ? 'lab' : 'practice');
           slot.style.top = topPerc + '%';
           slot.style.height = heightPerc + '%';
-          slot.href = item.link && item.link !== '#' ? item.link : 'javascript:void(0)';
-          slot.target = '_blank';
-          slot.rel = 'noopener noreferrer';
-
-          // structure: title on top center, optional note, time bottom center
+          
+          // Title
           const title = document.createElement('div');
           title.className = 'title';
           title.textContent = item.title;
 
+          // Note / Link
           const note = document.createElement('div');
           note.className = 'meta';
-          note.textContent = item.note || '';
-
-          // NOTE: per request, DO NOT render the 'type' element (short labels like "лек", "прак", "лаб")
-          // const type = document.createElement('div');
-          // type.className = 'type';
-          // type.textContent = shortType(item.type);
+          if(item.noteLink) {
+             // Create an actual link for the note that stops propagation
+             const noteAnchor = document.createElement('a');
+             noteAnchor.href = item.noteLink;
+             noteAnchor.target = '_blank';
+             noteAnchor.rel = 'noopener noreferrer';
+             noteAnchor.textContent = item.note;
+             noteAnchor.style.color = 'inherit';
+             noteAnchor.style.textDecoration = 'underline dotted';
+             
+             // Stop propagation so clicking this doesn't trigger the main slot click
+             noteAnchor.addEventListener('click', (e) => {
+               e.stopPropagation();
+             });
+             note.appendChild(noteAnchor);
+          } else {
+             note.textContent = item.note || '';
+          }
 
           const time = document.createElement('div');
           time.className = 'time';
@@ -701,17 +707,22 @@
 
           slot.appendChild(title);
           if(item.note) slot.appendChild(note);
-          // intentionally NOT appending type
           slot.appendChild(time);
 
           dayCol.appendChild(slot);
 
-          if (!item.link || item.link === '#'){
-            slot.addEventListener('click', (e) => {
+          // Handle main click on the slot
+          slot.addEventListener('click', (e) => {
+            // Check if we didn't click the inner link (though stopPropagation handles it, this is extra safety)
+            if(e.target.tagName === 'A') return;
+
+            if (!item.link || item.link === '#'){
               e.preventDefault();
               alert('Посилання поки що не доступне (Coming soon).');
-            });
-          }
+            } else {
+              window.open(item.link, '_blank');
+            }
+          });
         }
       }
     }
