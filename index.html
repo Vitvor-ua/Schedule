@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Розклад</title>
+<link rel="icon" href="icon.png"> 
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
 
@@ -19,6 +20,7 @@
     --slot-bg: rgba(255,255,255,0.03);
     --now-line: rgba(255,80,80,0.95);
     --shadow: 0 8px 30px rgba(2,6,23,0.7);
+    --card-border: rgba(255,255,255,0.05);
     transition: 300ms;
   }
   [data-theme="light"]{
@@ -31,6 +33,7 @@
     --now-line: #e11d48;
     --shadow: 0 8px 30px rgba(12,20,40,0.08);
     --accent-solid: #6366f1;
+    --card-border: rgba(0,0,0,0.05);
   }
 
   *{box-sizing:border-box}
@@ -259,7 +262,6 @@
     word-break:normal;
     overflow-wrap:break-word;
     hyphens:none;
-    /* Added per request: underline text */
     text-decoration: underline; 
   }
   .slot .time {
@@ -312,6 +314,43 @@
   .page{ display:none }
   .page.active{ display:block; animation: fadeIn .36s ease both; }
   @keyframes fadeIn{ from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none} }
+
+  /* Styling for Subjects Page */
+  .subjects-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  @media(min-width: 768px) {
+    .subjects-grid { grid-template-columns: 1fr 1fr; }
+  }
+  .subject-card {
+    background: var(--glass);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+  .subject-card h4 {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    color: var(--text);
+    border-bottom: 2px solid rgba(255,255,255,0.1);
+    padding-bottom: 8px;
+  }
+  .subject-card ul {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .subject-card li {
+    margin-bottom: 6px;
+  }
+  .hl-deadline { color: #f87171; font-weight: 600; }
+  .hl-points { color: #34d399; font-weight: 600; }
+  .hl-warn { color: #fb923c; }
 
   .footer{ margin-top:12px; color:var(--muted); font-size:13px; text-align:center }
   a.link { color:inherit; text-decoration:underline dotted; }
@@ -409,6 +448,95 @@
         </div>
       </div>
 
+      <div class="page" id="page-subjects">
+        <h3 style="margin-top:6px; margin-bottom:16px;">Інформація про предмети</h3>
+        <div class="subjects-grid">
+
+          <div class="subject-card">
+            <h4>Обробка та аналіз текстових даних на Python</h4>
+            <ul>
+              <li>Лаби та лекції у класрумі.</li>
+              <li><strong>Автомат:</strong> обов'язково усі лаби і 2 мкр для заліку.</li>
+              <li>Контрольні: тест Гугл форми на пів пари.</li>
+              <li>Лабораторні з захистом і звітом. Дедлайн у класрумі, після нього знижено бал. Захист можна після дедлайну.</li>
+              <li>Для календарного контролю треба набрати 50% балів (уточнить пізніше).</li>
+              <li><span class="hl-points">Бали:</span> 2 мкр по 14, 8 лаб по 9.</li>
+            </ul>
+          </div>
+
+          <div class="subject-card">
+            <h4>Аналіз даних на Python</h4>
+            <ul>
+              <li>Вхід тільки з lll.kpi. Лаби та лекції у класрумі.</li>
+              <li><strong>Автомат:</strong> обов'язково усі лаби і 2 мкр для заліку.</li>
+              <li>Контрольні: тест Гугл форми на пів пари.</li>
+              <li>Звіти: дедлайн у класрумі, запізнення = мінус бал. Захист можливий після дедлайну.</li>
+              <li>Для КК: 50% можливих балів.</li>
+              <li><span class="hl-points">Бали:</span> 2 мкр по 14, 8 лаб по 9.</li>
+            </ul>
+          </div>
+
+          <div class="subject-card">
+            <h4>Методи та системи ШІ</h4>
+            <ul>
+              <li><span class="hl-points">Бали:</span> Лаби 1-6 (7б звіт, 3б захист). Лаба 7 (8б звіт, 2б захист).</li>
+              <li>2 МКР (тестові) по 5 балів. Залік на останньому занятті (тест на 20б).</li>
+              <li>Звіт: титулка, постановка, хід роботи, <span class="hl-warn">потужні висновки</span>. Надсилати на пошту.</li>
+              <li>Бонус: Курс на вибір (сертифікат = 5 балів). Задачі на логіку на лекціях (+1 бал).</li>
+              <li><strong>Дедлайнів немає.</strong></li>
+              <li>1 атестація: 3 лаби (без захисту) + 1 мкр.</li>
+              <li>2 атестація: 6 лаб + 2 мкр.</li>
+              <li>Допуск до заліку: здати усі лаби.</li>
+              <li>Комунікація в ТГ чаті.</li>
+            </ul>
+          </div>
+
+          <div class="subject-card">
+            <h4>Сучасні операційні системи</h4>
+            <ul>
+              <li><span class="hl-deadline">Дедлайни є!</span> 17 днів на роботу.</li>
+              <li>При простроченні: <strong>мінус 2 бали</strong> кожні 17 днів.</li>
+              <li>6 практичних по 10 балів (наприкінці конвертується 60 -> 100).</li>
+              <li>Асинхронний режим.</li>
+              <li>Звіт (PDF): Скріншоти, код, файл, міркування, інформація про компіляцію, середовище. Бажано відео. Титулка не потрібна.</li>
+              <li>Можна зарахувати курси замість практикуму (або свої).</li>
+              <li>2 календарний контроль: 4 роботи.</li>
+              <li>Для заліку достатньо набрати 60 балів (не обов'язково все здавати).</li>
+            </ul>
+          </div>
+
+          <div class="subject-card">
+            <h4>Архітектура комп'ютерів 3</h4>
+            <ul>
+              <li>Лекції та воркшопи (Embedded C). Записи будуть. Середа 18:30 (Контраденко).</li>
+              <li>Все у класрумі. Прикріпляти відео, протокол, Gitlab.</li>
+              <li>Альтернативний курс: ~75 балів (форма запису в орг. питаннях). Перші 2 лаби (асемблер) обов'язкові для всіх.</li>
+              <li>Основний курс: віддалені плати з камерами або обладнання Новою поштою.</li>
+              <li>Курсова: розробка мікропроцесору (схема) АБО розробка ПЗ для фізичного мікропроцесора.</li>
+            </ul>
+          </div>
+
+          <div class="subject-card">
+            <h4>Англійська</h4>
+            <ul>
+              <li>Семестр: 50 балів (16 занять по 2.5). Підсумковий тест: 10 балів.</li>
+              <li>Сертифікат Coursera (мінімум 30 год): 15 балів.</li>
+              <li>Теми: Programming languages, Business English, Career development.</li>
+              <li>Дедлайн сертифікатів: <span class="hl-deadline">до 12 квітня</span>. Завантажити на диск скріншот та файл.</li>
+            </ul>
+          </div>
+
+          <div class="subject-card">
+            <h4>Системне програмування</h4>
+            <ul>
+              <li>Зміст звіту вказано в умовах лабораторних.</li>
+              <li>Надсилати на: <code>comsys.spz@gmail.com</code></li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+
       <div class="footer">Переключайте сторінки через меню вгорі праворуч • Натисніть на блок, щоб відкрити посилання</div>
     </section>
   </div>
@@ -422,6 +550,7 @@
       <a class="menu-action" data-user="vitvor">Розклад by Vitvor</a>
       <a class="menu-action" data-user="artem">Графік для Артема</a>
       <a class="menu-action" data-page="page-calendar">Графік навчального процесу</a>
+      <a class="menu-action" data-page="page-subjects">Інформація про предмети</a>
     </nav>
     <div style="margin-top:auto;color:var(--muted);font-size:13px">
       Порада: користуйтеся стрілками або кнопкою «Сьогодні» для навігації між тижнями.
@@ -803,7 +932,7 @@
         refresh(); // Re-render grid
       }
       
-      // Handle Page Switch (Calendar)
+      // Handle Page Switch (Calendar / Subjects)
       if (actionEl.dataset.page) {
         const target = actionEl.dataset.page;
         document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
