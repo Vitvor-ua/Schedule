@@ -37,18 +37,23 @@
   }
 
   *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0;
-    font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,"Helvetica Neue",Arial;
+  html { height: 100%; }
+  body {
+    margin: 0;
+    min-height: 100%; /* Дозволяє body рости разом з контентом */
+    font-family: Inter,system-ui,-apple-system,'Segoe UI',Roboto,"Helvetica Neue",Arial;
+    
+    /* Додаємо background-attachment: fixed */
     background: radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.04), transparent),
                 radial-gradient(900px 500px at 90% 90%, rgba(6,182,212,0.03), transparent),
                 var(--bg);
-    color:var(--text);
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-    padding:28px;
-    transition:background 300ms,color 300ms;
+    background-attachment: fixed; /* <--- ЦЕ ГОЛОВНИЙ ФІКС */
+    
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    padding: 28px;
+    transition: background 300ms, color 300ms;
   }
 
   .header{
@@ -65,19 +70,22 @@
     gap:14px;
     align-items:center;
   }
-  .epic{
-    font-weight:900;
-    letter-spacing:0.6px;
-    font-size:26px;
-    line-height:1;
+  .epic {
+    font-weight: 900;
+    letter-spacing: 0.6px;
+    font-size: 26px;
+    
+    line-height: 1.2; /* БУЛО 1. Збільшуємо, щоб вліз хвостик 'y' */
+    padding-bottom: 4px; /* Додаткове місце знизу для анімації */
+    
     background: var(--accent);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     text-shadow: 0 4px 18px rgba(0,0,0,0.25);
-    transform-origin:left;
+    transform-origin: left;
     animation: floatText 6s ease-in-out infinite;
-    max-width:520px;
+    max-width: 520px;
   }
   @keyframes floatText{
     0%{transform:translateY(0) rotate(-1deg)}
@@ -154,6 +162,7 @@
     gap:10px;
     align-items:center;
     margin-bottom:10px;
+    z-index: 20;
   }
   .days-row .days{
     display:grid;
@@ -178,6 +187,7 @@
   .grid-wrap{
     display:flex;
     gap:12px;
+    position: relative; /* For sticky context */
   }
   .time-col{
     width:80px;
@@ -186,6 +196,7 @@
     flex-direction:column;
     gap:0;
     padding-top:10px;
+    z-index: 10;
   }
   .time-cell{
     height:64px;
@@ -243,7 +254,7 @@
     cursor:pointer;
     text-decoration: none;
   }
-  .slot:hover{ transform: translateY(-6px); box-shadow: 0 18px 40px rgba(2,6,23,0.6); }
+  .slot:hover{ transform: translateY(-6px); box-shadow: 0 18px 40px rgba(2,6,23,0.6); z-index: 15; }
 
   .slot .meta{font-size:12px;color:var(--muted); font-weight:600; text-align: center; z-index: 2;}
   .slot .meta a:hover { color: var(--text); }
@@ -281,6 +292,7 @@
     transform-origin:left;
     z-index:30;
     box-shadow: 0 0 12px var(--now-line);
+    pointer-events: none;
   }
   .now-dot{
     position:absolute;
@@ -357,14 +369,76 @@
 
   .made-by{ position:fixed; left:22px; bottom:14px; font-size:13px; color:var(--muted); z-index:90 }
 
+  /* ------------------------------------------- */
+  /* NEW MOBILE ADAPTATION (PRESERVES DESKTOP)   */
+  /* ------------------------------------------- */
   @media (max-width:980px){
-    .main{ grid-template-columns: 1fr; }
-    .sidebar{ order:2 }
-    .schedule-card{ order:1 }
-    .days-row .days{ grid-template-columns: repeat(4,1fr); font-size:13px }
-    .time-cell{font-size:11px}
-    .week-header{min-width:unset}
-    .epic{font-size:20px}
+    body { padding: 12px; }
+    
+    .header { flex-wrap: wrap; height: auto; min-height: auto; }
+    .week-header { order: 3; width: 100%; margin-top: 10px; min-width: auto; }
+    .controls { flex-wrap: wrap; width: 100%; justify-content: flex-end; }
+    
+    .main{ 
+        display: flex; 
+        flex-direction: column; 
+        gap: 16px;
+    }
+    
+    /* Move sidebar to top */
+    .sidebar{ 
+        order: -1; 
+        min-height: auto;
+        padding: 10px;
+    }
+    
+    /* Horizontal Legend */
+    .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 8px !important;
+    }
+    .legend .item { border: none; padding: 0; }
+    
+    /* SCROLLABLE CONTAINER LOGIC */
+    .schedule-card {
+        padding: 0; /* Remove padding to maximize space */
+        overflow-x: auto; /* Enable horizontal scroll */
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .page.active {
+        min-width: 600px; /* Force page to be wider than screen */
+        padding: 10px;
+    }
+
+    /* Sticky Time Column */
+    .time-col {
+        position: sticky;
+        left: 0;
+        background: var(--bg); /* Cover content sliding under */
+        z-index: 40;
+        width: 50px; min-width: 50px;
+    }
+    .days-row {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: var(--bg);
+        grid-template-columns: 50px 1fr;
+    }
+    
+    /* Ensure columns have enough width */
+    .days-row .days, .col-days {
+        grid-template-columns: repeat(4, minmax(130px, 1fr));
+    }
+    
+    .slot { left: 2px; width: 96%; }
+    .slot .title { font-size: 13px; }
+    .days-row, .time-col { background: var(--bg); }
+    
+    .made-by { position: static; text-align: center; margin-top: 20px; }
   }
 </style>
 </head>
@@ -418,7 +492,7 @@
     <section class="schedule-card">
       <div class="page active" id="page-schedule">
         <div class="days-row">
-          <div style="font-size:13px;color:var(--muted)">Час</div>
+          <div style="font-size:13px;color:var(--muted); text-align:right; padding-right:8px">Час</div>
           <div class="days" id="dayHeaders"></div>
         </div>
 
@@ -453,7 +527,7 @@
         <div class="subjects-grid">
 
           <div class="subject-card">
-            <h4>Обробка та аналіз текстових даних на Python</h4>
+            <h4>Текст python</h4>
             <ul>
               <li>Лаби та лекції у класрумі.</li>
               <li><strong>Автомат:</strong> обов'язково усі лаби і 2 мкр для заліку.</li>
@@ -465,7 +539,7 @@
           </div>
 
           <div class="subject-card">
-            <h4>Аналіз даних на Python</h4>
+            <h4>Дані python</h4>
             <ul>
               <li>Вхід тільки з lll.kpi. Лаби та лекції у класрумі.</li>
               <li><strong>Автомат:</strong> обов'язково усі лаби і 2 мкр для заліку.</li>
@@ -477,7 +551,7 @@
           </div>
 
           <div class="subject-card">
-            <h4>Методи та системи ШІ</h4>
+            <h4>Методи ШІ</h4>
             <ul>
               <li><span class="hl-points">Бали:</span> Лаби 1-6 (7б звіт, 3б захист). Лаба 7 (8б звіт, 2б захист).</li>
               <li>2 МКР (тестові) по 5 балів. Залік на останньому занятті (тест на 20б).</li>
@@ -492,7 +566,7 @@
           </div>
 
           <div class="subject-card">
-            <h4>Сучасні операційні системи</h4>
+            <h4>Сучасні ОС</h4>
             <ul>
               <li><span class="hl-deadline">Дедлайни є!</span> 17 днів на роботу.</li>
               <li>При простроченні: <strong>мінус 2 бали</strong> кожні 17 днів.</li>
@@ -506,7 +580,7 @@
           </div>
 
           <div class="subject-card">
-            <h4>Архітектура комп'ютерів 3</h4>
+            <h4>АК (Архітектура)</h4>
             <ul>
               <li>Лекції та воркшопи (Embedded C). Записи будуть. Середа 18:30 (Контраденко).</li>
               <li>Все у класрумі. Прикріпляти відео, протокол, Gitlab.</li>
@@ -527,7 +601,7 @@
           </div>
 
           <div class="subject-card">
-            <h4>Системне програмування</h4>
+            <h4>Системне ПЗ</h4>
             <ul>
               <li>Зміст звіту вказано в умовах лабораторних.</li>
               <li>Надсилати на: <code>comsys.spz@gmail.com</code></li>
@@ -574,19 +648,19 @@
     {id:5, start:'16:10', end:'17:45'}
   ];
 
-  // VITVOR SCHEDULE
+  // VITVOR SCHEDULE (Names Shortened)
   const scheduleVitvor = {
     1: {
       1: [
-        {title:'Обробка та аналіз текстових даних на Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
-        {title:'Аналіз даних з використанням мови Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
-        {title:'Методи та системи штучного інтелекту', link:'https://us04web.zoom.us/j/3939550950?pwd=b0M1M00zbGhmelUxQW13dTI5dkQ5UT09', type:'lecture'},
-        {title:'Сучасні операційні системи', link:'https://us02web.zoom.us/j/5249202812?pwd=ci96MGpqNG1yU3B2aXdMbzcrWU1ndz09', type:'lecture'}
+        {title:'Текст python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
+        {title:'Дані python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
+        {title:'Методи ШІ', link:'https://us04web.zoom.us/j/3939550950?pwd=b0M1M00zbGhmelUxQW13dTI5dkQ5UT09', type:'lecture'},
+        {title:'Сучасні ОС', link:'https://us02web.zoom.us/j/5249202812?pwd=ci96MGpqNG1yU3B2aXdMbzcrWU1ndz09', type:'lecture'}
       ],
       2: [
         null,
         {
-          title:'Системне програмне забезпечення', 
+          title:'Системне ПЗ', 
           link:'https://bbb.comsys.kpi.ua/rooms/and-722-eja', 
           type:'lecture',
           note: 'Альтернатива meet',
@@ -594,26 +668,26 @@
         }
       ],
       3: [
-        {title:'Архітектура комп\'ютерів', link:'https://us02web.zoom.us/j/5274433531?pwd=L5kbH2aNdFh4Xn4jhtbXG5AZnFKS6T.1', type:'lecture'},
-        {title:'Архітектура комп\'ютерів', link:'https://us02web.zoom.us/j/5274433531?pwd=L5kbH2aNdFh4Xn4jhtbXG5AZnFKS6T.1', type:'lab'},
+        {title:'АК', link:'https://us02web.zoom.us/j/5274433531?pwd=L5kbH2aNdFh4Xn4jhtbXG5AZnFKS6T.1', type:'lecture'},
+        {title:'АК', link:'https://us02web.zoom.us/j/5274433531?pwd=L5kbH2aNdFh4Xn4jhtbXG5AZnFKS6T.1', type:'lab'},
         {title:'Англійська', link:'https://us04web.zoom.us/j/78533274147?pwd=blwzUR3m7F0tSFtIEcgxSPjZOhbtYY.1', type:'practice'}
       ],
       4: [
         null,
-        {title:'Сучасні операційні системи', link:'https://us02web.zoom.us/j/5249202812?pwd=ci96MGpqNG1yU3B2aXdMbzcrWU1ndz09', type:'lab'}
+        {title:'Сучасні ОС', link:'https://us02web.zoom.us/j/5249202812?pwd=ci96MGpqNG1yU3B2aXdMbzcrWU1ndz09', type:'lab'}
       ]
     },
     2: {
       1: [
-        {title:'Обробка та аналіз текстових даних на Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
-        {title:'Аналіз даних з використанням мови Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
-        {title:'Методи та системи штучного інтелекту', link:'https://us04web.zoom.us/j/3939550950?pwd=b0M1M00zbGhmelUxQW13dTI5dkQ5UT09', type:'lecture'},
-        {title:'Сучасні операційні системи', link:'https://us02web.zoom.us/j/5249202812?pwd=ci96MGpqNG1yU3B2aXdMbzcrWU1ndz09', type:'lecture'}
+        {title:'Текст python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
+        {title:'Дані python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
+        {title:'Методи ШІ', link:'https://us04web.zoom.us/j/3939550950?pwd=b0M1M00zbGhmelUxQW13dTI5dkQ5UT09', type:'lecture'},
+        {title:'Сучасні ОС', link:'https://us02web.zoom.us/j/5249202812?pwd=ci96MGpqNG1yU3B2aXdMbzcrWU1ndz09', type:'lecture'}
       ],
       2: [
         null,
         {
-          title:'Системне програмне забезпечення', 
+          title:'Системне ПЗ', 
           link:'https://bbb.comsys.kpi.ua/rooms/and-722-eja', 
           type:'lecture',
           note: 'Альтернатива meet',
@@ -621,51 +695,51 @@
         }
       ],
       3: [
-        {title:'Архітектура комп\'ютерів', link:'https://us02web.zoom.us/j/5274433531?pwd=L5kbH2aNdFh4Xn4jhtbXG5AZnFKS6T.1', type:'lecture'},
-        {title:'Системне програмне забезпечення', link:'https://us05web.zoom.us/j/6091939855?pwd=S2p5aEZSQlhKanJWZURRcDR0YkZ6UT09', type:'lab'},
+        {title:'АК', link:'https://us02web.zoom.us/j/5274433531?pwd=L5kbH2aNdFh4Xn4jhtbXG5AZnFKS6T.1', type:'lecture'},
+        {title:'Системне ПЗ', link:'https://us05web.zoom.us/j/6091939855?pwd=S2p5aEZSQlhKanJWZURRcDR0YkZ6UT09', type:'lab'},
         {title:'Англійська', link:'https://us04web.zoom.us/j/78533274147?pwd=blwzUR3m7F0tSFtIEcgxSPjZOhbtYY.1', type:'practice'}
       ],
       4: [
         null,
-        {title:'Аналіз даних з використанням мови Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lab'},
-        {title:'Обробка та аналіз текстових даних на Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lab'},
-        {title:'Методи та системи штучного інтелекту', link:'https://us05web.zoom.us/j/3769817683?pwd=OXFCbzZSbDRGcWlKNmpRTFY3U3NUQT09', type:'lab'}
+        {title:'Дані python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lab'},
+        {title:'Текст python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lab'},
+        {title:'Методи ШІ', link:'https://us05web.zoom.us/j/3769817683?pwd=OXFCbzZSbDRGcWlKNmpRTFY3U3NUQT09', type:'lab'}
       ]
     }
   };
 
-  // ARTEM SCHEDULE
+  // ARTEM SCHEDULE (Fixed Logic)
   const scheduleArtem = {
     1: {
       1: [
-        {title:'Обробка та аналіз текстових даних на Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
-        {title:'Аналіз даних з використанням мови Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
-        // REPLACED: 3 pair Monday
-        {title:'Програмні засоби проектування та реалізації нейромережевих систем', link:'https://us02web.zoom.us/j/3428560060?pwd=YTZ4Vm8xVTYzTGhzQk5ONGpTcmVSZz09', type:'lecture'},
-        {title:'Сучасні операційні системи', link:'https://us02web.zoom.us/j/5249202812?pwd=ci96MGpqNG1yU3B2aXdMbzcrWU1ndz09', type:'lecture'}
+        {title:'Текст python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
+        {title:'Дані python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
+        // REPLACED: 3 pair Monday (Method AI -> Neural Net)
+        {title:'Нейромережі', link:'https://us02web.zoom.us/j/3428560060?pwd=YTZ4Vm8xVTYzTGhzQk5ONGpTcmVSZz09', type:'lecture'},
+        {title:'Сучасні ОС', link:'https://us02web.zoom.us/j/5249202812?pwd=ci96MGpqNG1yU3B2aXdMbzcrWU1ndz09', type:'lecture'}
       ],
-      2: scheduleVitvor[1][2], // Same as Vitvor
-      3: scheduleVitvor[1][3], // Same as Vitvor
+      2: scheduleVitvor[1][2], 
+      3: scheduleVitvor[1][3], 
       4: [
         // ADDED: 1 pair Thursday (Lab)
-        {title:'Програмні засоби проектування та реалізації нейромережевих систем', link:'https://us02web.zoom.us/j/3428560060?pwd=YTZ4Vm8xVTYzTGhzQk5ONGpTcmVSZz09', type:'lab'},
-        {title:'Сучасні операційні системи', link:'https://us02web.zoom.us/j/5249202812?pwd=ci96MGpqNG1yU3B2aXdMbzcrWU1ndz09', type:'lab'}
+        {title:'Нейромережі', link:'https://us02web.zoom.us/j/3428560060?pwd=YTZ4Vm8xVTYzTGhzQk5ONGpTcmVSZz09', type:'lab'},
+        {title:'Сучасні ОС', link:'https://us02web.zoom.us/j/5249202812?pwd=ci96MGpqNG1yU3B2aXdMbzcrWU1ndz09', type:'lab'}
       ]
     },
     2: {
       1: [
-        {title:'Обробка та аналіз текстових даних на Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
-        {title:'Аналіз даних з використанням мови Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
+        {title:'Текст python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
+        {title:'Дані python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lecture'},
         // REPLACED: 3 pair Monday
-        {title:'Програмні засоби проектування та реалізації нейромережевих систем', link:'https://us02web.zoom.us/j/3428560060?pwd=YTZ4Vm8xVTYzTGhzQk5ONGpTcmVSZz09', type:'lecture'},
-        {title:'Сучасні операційні системи', link:'https://us02web.zoom.us/j/5249202812?pwd=ci96MGpqNG1yU3B2aXdMbzcrWU1ndz09', type:'lecture'}
+        {title:'Нейромережі', link:'https://us02web.zoom.us/j/3428560060?pwd=YTZ4Vm8xVTYzTGhzQk5ONGpTcmVSZz09', type:'lecture'},
+        {title:'Сучасні ОС', link:'https://us02web.zoom.us/j/5249202812?pwd=ci96MGpqNG1yU3B2aXdMbzcrWU1ndz09', type:'lecture'}
       ],
-      2: scheduleVitvor[2][2], // Same
-      3: scheduleVitvor[2][3], // Same
+      2: scheduleVitvor[2][2], 
+      3: scheduleVitvor[2][3], 
       4: [
         null,
-        {title:'Аналіз даних з використанням мови Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lab'},
-        {title:'Обробка та аналіз текстових даних на Python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lab'}
+        {title:'Дані python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lab'},
+        {title:'Текст python', link:'https://us02web.zoom.us/j/9470737287?pwd=endFbkJ6d0Izb1Z6K0Y1R1VQL1poUT09', type:'lab'}
         // REMOVED: AI Lab (4th pair)
       ]
     }
