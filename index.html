@@ -11,7 +11,7 @@
 <style>
   :root{
     --bg: #0f1724;
-    --card: #0b1220;
+    --card: #161e2e; /* Трохи світліше за bg для контрасту */
     --muted: #9aa4b2;
     --accent: linear-gradient(90deg,#7c3aed,#06b6d4);
     --text: #e6eef5;
@@ -40,14 +40,13 @@
   html { height: 100%; }
   body {
     margin: 0;
-    min-height: 100%; /* Дозволяє body рости разом з контентом */
+    min-height: 100%;
     font-family: Inter,system-ui,-apple-system,'Segoe UI',Roboto,"Helvetica Neue",Arial;
     
-    /* Додаємо background-attachment: fixed */
     background: radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.04), transparent),
                 radial-gradient(900px 500px at 90% 90%, rgba(6,182,212,0.03), transparent),
                 var(--bg);
-    background-attachment: fixed; /* <--- ЦЕ ГОЛОВНИЙ ФІКС */
+    background-attachment: fixed;
     
     color: var(--text);
     -webkit-font-smoothing: antialiased;
@@ -74,10 +73,8 @@
     font-weight: 900;
     letter-spacing: 0.6px;
     font-size: 26px;
-    
-    line-height: 1.2; /* БУЛО 1. Збільшуємо, щоб вліз хвостик 'y' */
-    padding-bottom: 4px; /* Додаткове місце знизу для анімації */
-    
+    line-height: 1.2;
+    padding-bottom: 4px;
     background: var(--accent);
     -webkit-background-clip: text;
     background-clip: text;
@@ -187,7 +184,7 @@
   .grid-wrap{
     display:flex;
     gap:12px;
-    position: relative; /* For sticky context */
+    position: relative;
   }
   .time-col{
     width:80px;
@@ -327,7 +324,6 @@
   .page.active{ display:block; animation: fadeIn .36s ease both; }
   @keyframes fadeIn{ from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none} }
 
-  /* Styling for Subjects Page */
   .subjects-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -370,10 +366,16 @@
   .made-by{ position:fixed; left:22px; bottom:14px; font-size:13px; color:var(--muted); z-index:90 }
 
   /* ------------------------------------------- */
-  /* NEW MOBILE ADAPTATION (PRESERVES DESKTOP)   */
+  /* ВИПРАВЛЕНА МОБІЛЬНА ВЕРСІЯ                 */
   /* ------------------------------------------- */
   @media (max-width:980px){
-    body { padding: 12px; }
+    body { 
+      padding: 12px; 
+      /* ВИПРАВЛЕННЯ СИНЬОГО СВІЧЕННЯ (FIX 1) */
+      /* Змінюємо fixed на scroll, щоб градієнт не обрізався */
+      background-attachment: scroll; 
+      background-position: center top; 
+    }
     
     .header { flex-wrap: wrap; height: auto; min-height: auto; }
     .week-header { order: 3; width: 100%; margin-top: 10px; min-width: auto; }
@@ -385,60 +387,87 @@
         gap: 16px;
     }
     
-    /* Move sidebar to top */
     .sidebar{ 
         order: -1; 
         min-height: auto;
         padding: 10px;
     }
     
-    /* Horizontal Legend */
+    /* ВИПРАВЛЕННЯ ЛЕГЕНДИ (FIX 3) - Розтягнута на всю ширину */
     .legend {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* 3 рівні колонки */
+        gap: 8px;
         margin-top: 8px !important;
+        width: 100%;
     }
-    .legend .item { border: none; padding: 0; }
+    .legend .item { 
+        border: 1px solid var(--card-border);
+        background: var(--glass);
+        padding: 8px 4px; 
+        border-radius: 8px;
+        justify-content: center;
+        border-bottom: none;
+    }
     
-    /* SCROLLABLE CONTAINER LOGIC */
     .schedule-card {
-        padding: 0; /* Remove padding to maximize space */
-        overflow-x: auto; /* Enable horizontal scroll */
+        padding: 0;
+        overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
     
     .page.active {
-        min-width: 600px; /* Force page to be wider than screen */
+        min-width: 600px; 
         padding: 10px;
     }
 
-    /* Sticky Time Column */
+    /* ВИПРАВЛЕННЯ ФОНУ (FIX 2) - Ефект матового скла замість суцільного кольору */
     .time-col {
         position: sticky;
         left: 0;
-        background: var(--bg); /* Cover content sliding under */
+        /* Напівпрозорий фон + блюр */
+        background: rgba(15, 23, 36, 0.85); 
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         z-index: 40;
         width: 50px; min-width: 50px;
+        border-right: 1px solid rgba(255,255,255,0.05);
     }
+    [data-theme="light"] .time-col {
+        background: rgba(246, 247, 251, 0.85);
+    }
+
     .days-row {
         position: sticky;
         top: 0;
         z-index: 50;
-        background: var(--bg);
+        /* Напівпрозорий фон + блюр */
+        background: rgba(15, 23, 36, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         grid-template-columns: 50px 1fr;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    [data-theme="light"] .days-row {
+        background: rgba(246, 247, 251, 0.85);
     }
     
-    /* Ensure columns have enough width */
     .days-row .days, .col-days {
         grid-template-columns: repeat(4, minmax(130px, 1fr));
     }
     
     .slot { left: 2px; width: 96%; }
     .slot .title { font-size: 13px; }
-    .days-row, .time-col { background: var(--bg); }
     
-    .made-by { position: static; text-align: center; margin-top: 20px; }
+    /* ВИПРАВЛЕННЯ MADE BY (FIX 4) - Вирівнювання */
+    .made-by { 
+        position: static; 
+        width: 100%;
+        text-align: center; 
+        margin-top: 24px;
+        margin-bottom: 12px;
+        left: 0; right: 0;
+    }
   }
 </style>
 </head>
